@@ -1,0 +1,125 @@
+###
+GET http://localhost:8080/
+
+###
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{"title": "First task","description": "First task description", "dueDate": "2025-10-27T10:30:00Z", "status": 1}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+###
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{"title": "Second task","description": "Second task description", "dueDate": "2026-10-27T10:30:00Z", "status": 3}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+    });
+%}
+
+###
+GET http://localhost:8080/tasks/filter?status=1&q=first
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        console.log(JSON.stringify(response.body));
+        client.assert(JSON.stringify(response.body) === JSON.stringify([{"Id":"first-task","Title":"First task","Description":"First task description","DueDate":"2025-10-27T10:30:00Z","Status":1}]), "Body match expected response")
+    });
+%}
+
+###
+GET http://localhost:8080/tasks
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        console.log(JSON.stringify(response.body));
+        client.assert(JSON.stringify(response.body) === JSON.stringify([{"Id":"first-task","Title":"First task","Description":"First task description","DueDate":"2025-10-27T10:30:00Z","Status":1},{"Id":"second-task","Title":"Second task","Description":"Second task description","DueDate":"2026-10-27T10:30:00Z","Status":3}]), "Body match expected response")
+    });
+%}
+
+###
+GET http://localhost:8080/tasks/first-task
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        console.log(JSON.stringify(response.body));
+        client.assert(JSON.stringify(response.body) === JSON.stringify({"Id":"first-task","Title":"First task","Description":"First task description","DueDate":"2025-10-27T10:30:00Z","Status":1}), "Body match expected response")
+    });
+%}
+
+###
+PUT  http://localhost:8080/tasks/first-task
+Content-Type: application/json
+
+{
+  "title": "First task",
+  "description": "First task description",
+  "dueDate": "2025-10-27T10:30:00Z",
+  "status": 2
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+GET http://localhost:8080/tasks/first-task
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        console.log(JSON.stringify(response.body));
+        client.assert(JSON.stringify(response.body) === JSON.stringify({"Id":"first-task","Title":"First task","Description":"First task description","DueDate":"2025-10-27T10:30:00Z","Status":2}), "Body match expected response")
+    });
+%}
+
+###
+DELETE http://localhost:8080/tasks/first-task
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+GET http://localhost:8080/tasks/first-task
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
+###
+DELETE http://localhost:8080/tasks/second-task
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+###
+GET http://localhost:8080/tasks/second-task
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
